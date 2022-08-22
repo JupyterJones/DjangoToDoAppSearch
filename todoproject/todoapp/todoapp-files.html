@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The todoapp files</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+
+    <h1 class="textshad">The file contents of the original "git clone"</h1>
+
+
+
+    <h2>----------------- urls.py ----------------------------</h2>
+
+    <pre class="all shad">
+
+    from django.urls import path
+    from . import views
+
+    urlpatterns = [
+    path('',views.index,name='index'),
+    path('submit',views.submit,name='submit'),
+    path('delete/&lt;int:id&gt;',views.delete,name='delete'),
+        path('list',views.list,name='list'),
+        path('sortdata',views.sortdata,name='sortdata'),
+        path('searchdata',views.searchdata,name='searchdata'),
+        path('edit/&lt;int:id&gt;',views.edit,name='edit'),
+            path('update/&lt;int:id&gt;',views.update,name='update')
+ ]
+    </pre>
+    <h2>----------------- views.py ---------------------------</h2>
+    <pre class="all shad">
+    from django.shortcuts import render
+    from .models import *
+    from django.http import HttpResponse,JsonResponse
+
+    # Create your views here.
+    def index(request):
+    return render(request,'index.html')
+
+    def submit(request):
+    obj = Todo()
+    obj.title = request.GET['title']
+    obj.description = request.GET['description']
+    obj.priority = request.GET['priority']
+    obj.save()
+    mydictionary = {
+    "alltodos" : Todo.objects.all()
+    }
+    return render(request,'list.html',context=mydictionary)
+
+    def delete(request,id):
+    obj = Todo.objects.get(id=id)
+    obj.delete()
+    mydictionary = {
+    "alltodos" : Todo.objects.all()
+    }
+    return render(request,'list.html',context=mydictionary)
+
+    def list(request):
+    mydictionary = {
+    "alltodos" : Todo.objects.all()
+    }
+    return render(request,'list.html',context=mydictionary)
+
+    def sortdata(request):
+    mydictionary ={
+    "alltodos" : Todo.objects.all().order_by('-priority')
+    }
+    return render(request,'list.html',context=mydictionary)
+
+    def searchdata(request):
+    q = request.GET['query']
+    mydictionary = {
+    "alltodos" : Todo.objects.filter(title__contains=q)
+    }
+    return render(request,'list.html',context=mydictionary)
+
+    def edit(request,id):
+    obj = Todo.objects.get(id=id)
+    mydictionary = {
+    "title" : obj.title,
+    "description" : obj.description,
+    "priority" : obj.priority,
+    "id" : obj.id
+    }
+    return render(request,'edit.html',context=mydictionary)
+
+
+    def update(request,id):
+    obj = Todo(id=id)
+    obj.title = request.GET['title']
+    obj.description = request.GET['description']
+    obj.priority = request.GET['priority']
+    import datetime
+    updated_at = datetime.datetime.now()
+    obj.created_at = updated_at
+    obj.save()
+    mydictionary = {
+    "alltodos" : Todo.objects.all()
+    }
+    return render(request,'list.html',context=mydictionary)
+</pre>
+
+
+    <h2>----------------- admin.py ---------------------------</h2>
+    <pre class="all shad">
+    from django.contrib import admin
+    # Register your models here.
+    </pre>
+    <h2>----------------- apps.py ----------------------------</h2>
+    <pre class="all shad">
+    from django.apps import AppConfig
+    class TodoappConfig(AppConfig):
+    name = 'todoapp'
+</pre>
+    ----------------- models.py --------------------------
+    <pre class="all shad">
+    from django.db import models
+
+    # Create your models here.
+    class Todo(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    priority = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True,null=True)
+</pre>
+    ----------------- tests.py ---------------------------
+    <pre class="all shad">
+    from django.test import TestCase
+
+    # Create your tests here.
+</pre>
+</body>
+
+</html>
